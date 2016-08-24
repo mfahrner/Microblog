@@ -10,13 +10,13 @@ import java.util.HashMap;
 public class Main {
 
     static User user;
-    static HashMap m = new HashMap();
     static ArrayList<String> messageStore = new ArrayList<>();
+    static HashMap m = new HashMap();
+
+
 
     public static void main(String[] args) {
         Spark.init();
-
-
 
         Spark.get(
                 "/",
@@ -25,7 +25,6 @@ public class Main {
                         return new ModelAndView(m, "index.html");
                     } else {
                         m.put("name", user.name);
-                        m.put(user.name, user.password);
                         return new ModelAndView(m, "messages.html");
                     }
                 }),
@@ -37,6 +36,11 @@ public class Main {
                 ((request, response) -> {
                     String name = request.queryParams("loginName");
                     String password = request.queryParams("password");
+
+                    if (password != "1234") {
+                        user = null;
+                        response.redirect("/");
+                    }
                     user = new User(name, password);
                     response.redirect("/");
                     return "";
@@ -52,5 +56,18 @@ public class Main {
                     return new ModelAndView(m, "messages.html");
                 })
         );
+
+//        Spark.post(
+//                "/create-message",
+//                ((request, response) -> {
+//                    ArrayList<Message> messageStore = new ArrayList();
+//                    String input = request.queryParams("message");
+//                    Message stuff = new Message(user.name, user.password, input);
+//                    messageStore.add(stuff);
+//                    m.put("messageList", messageStore);
+//                    response.redirect("/");
+//                    return new ModelAndView(m, "messages.html");
+//                })
+//        );
     }
 }
